@@ -1,0 +1,2 @@
+rootProject.name = '2022-03-otus-java-nikitov'
+include 'hw01-gradle'
