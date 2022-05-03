@@ -73,7 +73,6 @@ public class TestRunner {
     private static <T> void runBefore(List<Method> methodsWithBefore, T o2) {
         for (Method beforeMethod : methodsWithBefore) {
             try {
-                beforeMethod.setAccessible(true);
                 ReflectionHelper.callMethod(o2, beforeMethod.getName());
 
             } catch (Exception e) {
@@ -92,7 +91,6 @@ public class TestRunner {
     private static <T> void runAfter(List<Method> methodsWithAfter, T o2) {
         for (Method afterMethod : methodsWithAfter) {
             try {
-            afterMethod.setAccessible(true);
             ReflectionHelper.callMethod(o2, afterMethod.getName());
             } catch (Exception e) {
                 System.out.println(ANSI_RED
@@ -109,7 +107,6 @@ public class TestRunner {
 
     private static <T> void runTest(Method testMethod, T o2) {
         try {
-            testMethod.setAccessible(true);
             ReflectionHelper.callMethod(o2, testMethod.getName());
             System.out.println(ANSI_GREEN + testMethod.getName() + " passed" + ANSI_RESET);
         } catch (Exception e) {
