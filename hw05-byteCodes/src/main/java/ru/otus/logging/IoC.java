@@ -31,13 +31,6 @@ public class IoC {
             this.targetMethods = getTargetMethods(instance, annotationMarker);
         }
 
-        private List<Method> getTargetMethods(T instance, Class<? extends Annotation> annotationMarker) {
-            return Arrays.stream(instance.getClass().getMethods())
-                    .filter(method -> Arrays.stream(method.getDeclaredAnnotations())
-                            .anyMatch(annotation -> annotation.annotationType().equals(annotationMarker)))
-                    .collect(Collectors.toList());
-        }
-
         @Override
         public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
             if (isTargetMethod(method)) {
@@ -47,19 +40,26 @@ public class IoC {
             return method.invoke(instance, args);
         }
 
+        @Override
+        public String toString() {
+            return "DemoInvocationHandler{" +
+                    "myClass=" + instance +
+                    '}';
+        }
+
+        private List<Method> getTargetMethods(T instance, Class<? extends Annotation> annotationMarker) {
+            return Arrays.stream(instance.getClass().getMethods())
+                    .filter(method -> Arrays.stream(method.getDeclaredAnnotations())
+                            .anyMatch(annotation -> annotation.annotationType().equals(annotationMarker)))
+                    .collect(Collectors.toList());
+        }
+
         private boolean isTargetMethod(Method checkedMethod) {
 
             return targetMethods.stream()
                     .anyMatch(method -> method.getName().equals(checkedMethod.getName())
                             && Arrays.equals(method.getParameterTypes(),
                             checkedMethod.getParameterTypes()));
-        }
-
-        @Override
-        public String toString() {
-            return "DemoInvocationHandler{" +
-                    "myClass=" + instance +
-                    '}';
         }
     }
 }
