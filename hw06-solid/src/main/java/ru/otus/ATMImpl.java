@@ -3,10 +3,8 @@ package ru.otus;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Objects;
 
-import static ru.otus.BanknoteDenomination._5000;
-import static ru.otus.BanknoteDenomination.getBanknoteByDenomination;
+import static ru.otus.BanknoteDenomination.*;
 
 public class ATMImpl implements ATM {
 
@@ -15,16 +13,14 @@ public class ATMImpl implements ATM {
     @Override
     public void putMoney(BanknoteDenomination... newBills) {
         bills.addAll(Arrays.asList(newBills));
-//        bills.sort((o1, o2) -> o1.getDenomination() > o2.getDenomination());
     }
 
     @Override
     public BanknoteDenomination[] getMoney(long sum) throws NotEnoughMoneyException, NotPossibleToWithdrawTheSpecifiedAmountException {
         if (getBalance() >= sum) {
-            checkThePossibilityOfIssuingMoney(sum);
             return giveAwayMoney(sum);
         } else {
-            throw new NotEnoughMoneyException();
+            throw new NotEnoughMoneyException("Недостаточно средств");
         }
     }
 
@@ -33,53 +29,92 @@ public class ATMImpl implements ATM {
         return bills.stream().mapToLong(BanknoteDenomination::getDenomination).sum();
     }
 
-    // TODO: 07.07.2022 не реализовано
     private BanknoteDenomination[] giveAwayMoney(long sum) {
-//        return new BanknoteDenomination[]{_5000};
+        long count5000 = getCountByDenomination(_5000);
+        long count2000 = getCountByDenomination(_2000);
+        long count1000 = getCountByDenomination(_1000);
+        long count500 = getCountByDenomination(_500);
+        long count200 = getCountByDenomination(_200);
+        long count100 = getCountByDenomination(_100);
+        long count50 = getCountByDenomination(_50);
+        long count10 = getCountByDenomination(_10);
 
-
-        List<BanknoteDenomination> result = new ArrayList<>();
-        long[] denomination = bills.stream().mapToLong(BanknoteDenomination::getDenomination).toArray();
-        int i = 0, j, k = denomination.length;
-        while (k != 0 && denomination[--k] > sum)
-            ;
-        j = k;
-        long tempSum, count;
-        do {
-            if ((tempSum = sum % denomination[j]) >= denomination[0] || tempSum == 0) {
-                count = sum / denomination[j];
-                sum = tempSum;
-            } else {
-                count = sum / denomination[j] - 1;
-                sum = tempSum + denomination[j];
-            }
-            System.out.println("Denomination: " + denomination[j] + "; count: " + count);
-            for (int l = 0; l < count; l++) {
-                result.add(getBanknoteByDenomination(denomination[j]));
-            }
-            while (j != 0 && denomination[--j] > sum)
-                ;
-        } while (i < k && sum > 0);
+        List<BanknoteDenomination> result = giveAwayMoneyByCountsOfBanknote(new ArrayList<>(), new ArrayList<>(bills),
+                sum, count5000, count2000, count1000, count500, count200, count100, count50, count10);
+        removeBills(result);
         return result.toArray(new BanknoteDenomination[0]);
     }
 
-    // TODO: 07.07.2022 Должно быть хитрее
-    private void checkThePossibilityOfIssuingMoney(long sum) {
-//        if (!(getBalance() % sum == 0)) {
-//            throw new NotPossibleToWithdrawTheSpecifiedAmountException();
-//        }
+    private long getCountByDenomination(BanknoteDenomination banknoteDenomination) {
+        return bills.stream().filter(banknote -> banknote.equals(banknoteDenomination)).count();
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        ATMImpl atm = (ATMImpl) o;
-        return Objects.equals(bills, atm.bills);
+    private void removeBills(List<BanknoteDenomination> billsInOrderToGive) {
+        for (BanknoteDenomination banknote : billsInOrderToGive) {
+            bills.remove(banknote);
+        }
     }
 
-    @Override
-    public int hashCode() {
-        return Objects.hash(bills);
+    private List<BanknoteDenomination> giveAwayMoneyByCountsOfBanknote(List<BanknoteDenomination> billsInOrderToGive,
+                                                                       List<BanknoteDenomination> remainingBills,
+                                                                       long remainingSum, long count5000, long count2000,
+                                                                       long count1000, long count500, long count200,
+                                                                       long count100, long count50, long count10) {
+        for (; isIterationNeeded(remainingSum, count5000, _5000); count5000--) {
+            remainingBills.remove(remainingBills.indexOf(_5000));
+            billsInOrderToGive.add(_5000);
+            remainingSum = remainingSum - _5000.getDenomination();
+            if (remainingSum == 0) return billsInOrderToGive;
+        }
+        for (; isIterationNeeded(remainingSum, count2000, _2000); count2000--) {
+            remainingBills.remove(remainingBills.indexOf(_2000));
+            billsInOrderToGive.add(_2000);
+            remainingSum = remainingSum - _2000.getDenomination();
+            if (remainingSum == 0) return billsInOrderToGive;
+        }
+        for (; isIterationNeeded(remainingSum, count1000, _1000); count1000--) {
+            remainingBills.remove(remainingBills.indexOf(_1000));
+            billsInOrderToGive.add(_1000);
+            remainingSum = remainingSum - _1000.getDenomination();
+            if (remainingSum == 0) return billsInOrderToGive;
+        }
+        for (; isIterationNeeded(remainingSum, count500, _500); count500--) {
+            remainingBills.remove(remainingBills.indexOf(_500));
+            billsInOrderToGive.add(_500);
+            remainingSum = remainingSum - _500.getDenomination();
+            if (remainingSum == 0) return billsInOrderToGive;
+        }
+        for (; isIterationNeeded(remainingSum, count200, _200); count200--) {
+            remainingBills.remove(remainingBills.indexOf(_200));
+            billsInOrderToGive.add(_200);
+            remainingSum = remainingSum - _200.getDenomination();
+            if (remainingSum == 0) return billsInOrderToGive;
+        }
+        for (; isIterationNeeded(remainingSum, count100, _100); count100--) {
+            remainingBills.remove(remainingBills.indexOf(_100));
+            billsInOrderToGive.add(_100);
+            remainingSum = remainingSum - _100.getDenomination();
+            if (remainingSum == 0) return billsInOrderToGive;
+        }
+        for (; isIterationNeeded(remainingSum, count50, _50); count50--) {
+            remainingBills.remove(remainingBills.indexOf(_50));
+            billsInOrderToGive.add(_50);
+            remainingSum = remainingSum - _50.getDenomination();
+            if (remainingSum == 0) return billsInOrderToGive;
+        }
+        for (; isIterationNeeded(remainingSum, count10, _10); count10--) {
+            remainingBills.remove(remainingBills.indexOf(_10));
+            billsInOrderToGive.add(_10);
+            remainingSum = remainingSum - _10.getDenomination();
+            if (remainingSum == 0) return billsInOrderToGive;
+        }
+        throw new NotPossibleToWithdrawTheSpecifiedAmountException("Нет нужного количества банкнот");
+    }
+
+    private boolean isIterationNeeded(long remainingSum, long countThisBanknote,
+                                      BanknoteDenomination banknoteDenomination) {
+        return countThisBanknote > 0
+                && remainingSum / banknoteDenomination.getDenomination() * countThisBanknote > 0
+                && remainingSum - banknoteDenomination.getDenomination() >= 0;
     }
 }
