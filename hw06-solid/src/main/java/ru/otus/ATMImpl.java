@@ -20,7 +20,7 @@ public class ATMImpl implements ATM {
         if (getBalance() >= sum) {
             return giveAwayMoney(sum);
         } else {
-            throw new NotEnoughMoneyException("Недостаточно средств");
+            throw new NotEnoughMoneyException("Запрошена сумма - " + sum);
         }
     }
 
