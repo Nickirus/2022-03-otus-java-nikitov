@@ -32,8 +32,7 @@ public class HomeWork {
            по аналогии с Demo.class
            из элеменов "to do" создать new ComplexProcessor и обработать сообщение
          */
-        LocalDateTime time = LocalDateTime.now();
-        var processors = List.of(new ProcessorThrowsExceptionAtEvenSecond(time), new ProcessorSwapFields11And12(),
+        var processors = List.of(new ProcessorThrowsExceptionAtEvenSecond(LocalDateTime::now), new ProcessorSwapFields11And12(),
                 new LoggerProcessor(new ProcessorUpperField10()));
 
         var complexProcessor = new ComplexProcessor(processors, ex -> {});

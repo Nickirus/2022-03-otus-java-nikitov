@@ -15,7 +15,7 @@ class ProcessorThrowsExceptionAtEvenSecondTest {
     @Test
     @DisplayName("Assert does not throw exception")
     void processAtOddSecond() {
-        Processor processor = new ProcessorThrowsExceptionAtEvenSecond(
+        Processor processor = new ProcessorThrowsExceptionAtEvenSecond(() ->
                 LocalDateTime.of(2022, Month.SEPTEMBER, 5, 22, 50, 1)
         );
         assertDoesNotThrow(() -> processor.process(new Message.Builder(1L).field1("").build()));
@@ -24,7 +24,7 @@ class ProcessorThrowsExceptionAtEvenSecondTest {
     @Test
     @DisplayName("Assert EvenSecondException")
     void processAtEvenSecond() {
-        Processor processor = new ProcessorThrowsExceptionAtEvenSecond(
+        Processor processor = new ProcessorThrowsExceptionAtEvenSecond(() ->
                 LocalDateTime.of(2022, Month.SEPTEMBER, 5, 22, 50, 2)
         );
         assertThrows(EvenSecondException.class, () -> processor.process(new Message.Builder(1L).field1("").build()));
